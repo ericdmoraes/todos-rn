@@ -1,35 +1,59 @@
-import React, { useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import React, { useState, useEffect } from 'react'
+import { Alert, StyleSheet, View } from 'react-native'
 
-import { Header } from '../components/Header';
-import { Task, TasksList } from '../components/TasksList';
-import { TodoInput } from '../components/TodoInput';
+import { Header } from '../components/Header'
+import { Task, TasksList } from '../components/TasksList'
+import { TodoInput } from '../components/TodoInput'
 
 export function Home() {
-  const [tasks, setTasks] = useState<Task[]>([]);
+  const [tasks, setTasks] = useState<Task[]>([])
+
+  useEffect(() => {}, [tasks])
 
   function handleAddTask(newTaskTitle: string) {
-    //TODO - add new task
+    setTasks((oldState) => [
+      ...oldState,
+      {
+        id: new Date().getTime(),
+        title: newTaskTitle,
+        done: false,
+      },
+    ])
   }
 
   function handleToggleTaskDone(id: number) {
-    //TODO - toggle task done if exists
+    const editIndex = tasks.findIndex((task) => task.id === id)
+    let tasksEdit = [...tasks]
+    tasksEdit[editIndex].done = !tasksEdit[editIndex].done
+    setTasks(tasksEdit)
   }
 
   function handleRemoveTask(id: number) {
-    //TODO - remove task from state
+    Alert.alert('Remover', 'Você tem certeza?', [
+      {
+        text: 'Sim',
+        onPress: () => {
+          const removeIndex = tasks.findIndex((task) => task.id === id)
+          const tasksEdit = [...tasks]
+          tasksEdit.splice(removeIndex, 1)
+          setTasks(tasksEdit)
+        },
+      },
+      {
+        text: 'Cancel',
+        style: 'cancel',
+      },
+    ])
   }
 
   return (
     <View style={styles.container}>
       <Header tasksCounter={tasks.length} />
-
       <TodoInput addTask={handleAddTask} />
-
-      <TasksList 
-        tasks={tasks} 
+      <TasksList
+        tasks={tasks}
         toggleTaskDone={handleToggleTaskDone}
-        removeTask={handleRemoveTask} 
+        removeTask={handleRemoveTask}
       />
     </View>
   )
@@ -38,6 +62,6 @@ export function Home() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#EBEBEB'
-  }
+    backgroundColor: '#EBEBEB',
+  },
 })
